@@ -18,7 +18,7 @@
     
     {% for f in file %}
     <li class="nav-item active">
-      <a class="nav-link" target="_blank" href="{% url 'detail' f.slug None %}">{{ f.files.url }}</a>
+      <a class="nav-link" target="_blank" href="{% url 'detail' f.slug 0 %}">{{ f.files.name }}</a>
     </li>
     {% endfor %}
       
