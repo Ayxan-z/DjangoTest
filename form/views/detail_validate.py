@@ -1,5 +1,4 @@
 from django.http import HttpResponse
-from django.shortcuts import render
 from form.models import UploadModel
 import pandas as pd
 from django.conf import settings
