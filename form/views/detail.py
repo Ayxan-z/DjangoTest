@@ -11,9 +11,7 @@ def detailView(request, slug, column_index):
     dv = DetailValidate()
     table = dv.createTable(slug)
     
-    if type(table) != str:
-        print(type(table))
-        return table
+    if type(table) != str: return table
     
     graph = dv.createLineGraph(column_index)
     return render(request,
