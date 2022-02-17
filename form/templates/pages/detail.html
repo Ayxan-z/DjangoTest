@@ -1,5 +1,9 @@
 {% load static %}
-{{df_html|safe}}
+
+{% for table in tables %}
+  {{table|safe}}
+{% endfor %}
+
 
 <html>
 <head>
@@ -8,7 +12,7 @@
     var chart = new CanvasJS.Chart("chartContainer",
     {
       title:{
-      text: "Line Graph"
+      text: JSON.parse("{{graph_nameJSON|escapejs}}")
       },
        data: [
       {
@@ -23,6 +27,8 @@
   </script>
  <script type="text/javascript" src="{% static 'js/canvasjs.min.js' %}"></script></head>
 <body>
+  <br>
+  <br>
   <div id="chartContainer" style="height: 300px; width: 600px;">
   </div>
 </body>
