@@ -2,38 +2,10 @@ from django.http import HttpResponse
 from form.models import UploadModel
 import pandas as pd
 from django.conf import settings
-from json import dumps
+import json
 
 
 class DetailValidate():
-    
-    @staticmethod
-    def __openExcelAsDataFrame(url) -> pd.DataFrame:
-        return pd.read_excel(io=str(settings.BASE_DIR) + url)
-    
-    @staticmethod
-    def __openCsvAsDataFrame(url) -> pd.DataFrame:
-        df = pd.read_csv(str(settings.BASE_DIR) + url)
-        cnt = 0
-        d = {}
-        values = df.values
-        ndim = df.values.ndim
-        for i in range(ndim):
-            df.values[i][0] = df.values[i][0].split(';')
-            
-        for i in df.columns[0].split(';'):
-            l = []
-            for j in range(ndim):
-                try:
-                    value = float(values[j][0][cnt])
-    
-                except ValueError: value = values[j][0][cnt]
-    
-                l.append(value)
-            d[i] = l
-            cnt += 1
-            
-        return pd.DataFrame(d)
     
     @staticmethod
     def __dataFrameToHTML(df, slug):
@@ -62,29 +34,21 @@ class DetailValidate():
             graph_data.append({ 'x': x, 'y': i })
             x += 1
 
-        return dumps(graph_data)
+        return json.dumps(graph_data)
     
     def createTable(self):
         tables = UploadModel.objects.all()
-        # data = UploadModel.objects.filter(slug=slug)
         
         self.tables_data = {}
         for table in tables:
-            try: 
-                df = self.__openExcelAsDataFrame(table.files.url)
-                df = [self.__dataFrameToHTML(df, table.slug), df]
+            df = pd.DataFrame.from_dict(json.loads(table.table))
+            HTML_df = [self.__dataFrameToHTML(df, table.slug), df]
 
-            except: 
-                try: 
-                    df = self.__openCsvAsDataFrame(table.files.url)
-                    df = [self.__dataFrameToHTML(df, table.slug), df]
-
-                except: df = [None, None]
-
-            self.tables_data[table.slug] = df
+            self.tables_data[table.slug] = HTML_df
+            
         return self.tables_data
 
-    def createLineGraph(self, slug, column_index) -> dumps or None:
+    def createLineGraph(self, slug, column_index) -> json.dumps or None:
         if slug != 'None':
             df = self.tables_data[slug][1]
         
@@ -94,16 +58,7 @@ class DetailValidate():
 
                 if 'int' in str_type or 'float' in str_type:
                     graph_dataJSON = self.__dataFrameColumnToJSON(df, column_index)
-                    graph_nameJSON = dumps(df[df.columns[column_index]].name)
+                    graph_nameJSON = json.dumps(df[df.columns[column_index]].name)
                     
                     return [graph_dataJSON, graph_nameJSON]
         
-        
-        # if self.df.columns.__len__() >= column_index > 0 :
-        #     column_index -= 1
-        #     str_type = str(self.df[self.df.columns[column_index]].dtypes)
-                    
-        #     if 'int' in str_type or 'float' in str_type:
-        #         graph_dataJSON = self.__dataFrameColumnToJSON(self.df, column_index)
-        #         return graph_dataJSON
-            

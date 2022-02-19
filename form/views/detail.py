@@ -5,8 +5,7 @@ from .detail_validate import DetailValidate
 def detailView(request, slug, column_index):
     dv = DetailValidate()
     tables = dv.createTable()
-    # if type(table) != str: return table
-    
+
     tables_HTML = []
     for value in tables.values():
         if value[0]:
